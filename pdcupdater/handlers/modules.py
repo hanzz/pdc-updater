@@ -10,6 +10,7 @@ import pdcupdater.services
 from pdcupdater.utils import TmpDir, PushPopD
 
 import modulemd
+import hashlib
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +104,10 @@ class ModuleStateChangeHandler(pdcupdater.handlers.BaseHandler):
         release = body['version']
         variant_uid = "{n}-{v}-{r}".format(n=name, v=version, r=release)
         variant_id = name
-        koji_tag = "module-" + variant_uid.lower()
+
+        tag_str = '.'.join([name, version, str(release)])
+        tag_hash = hashlib.sha1(tag_str).hexdigest()[:16]
+        koji_tag = "module-" + tag_hash
 
         data = {
             'variant_id': variant_id,
